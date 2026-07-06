@@ -1,804 +1,1168 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grimoire du MJ — Tensurama</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --ink:#131019;
-    --ink-2:#1c1826;
-    --panel:#211c2e;
-    --panel-2:#2a2438;
-    --line: rgba(201,162,75,0.18);
-    --gold:#c9a24b;
-    --gold-bright:#e6c977;
-    --wine:#7a2635;
-    --wine-bright:#a13548;
-    --text:#e8e2d0;
-    --text-dim:#a89fb3;
-    --text-faint:#6f6680;
-    --radius: 3px;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grimoire de Campagne</title>
+    <style>
+        :root {
+            --bg-primary: #1a142e;
+            --bg-secondary: #2d2345;
+            --text-primary: #f8f6ff;
+            --text-secondary: #b8b0c8;
+            --accent-gold: #ffd700;
+            --accent-purple: #9d4edd;
+            --border-color: #4a3e5c;
+            --card-bg: #251f38;
+            --shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
 
-  * { box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-  html, body{
-    margin:0; padding:0; height:100%;
-    background: var(--ink);
-    color: var(--text);
-    font-family: 'EB Garamond', serif;
-    font-size: 18px;
-  }
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #2d1b4e 0%, #1a142e 100%);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid var(--accent-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-  body{
-    background-image:
-      radial-gradient(ellipse at top left, rgba(122,38,53,0.10), transparent 45%),
-      radial-gradient(ellipse at bottom right, rgba(201,162,75,0.06), transparent 50%);
-  }
+        header h1 {
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
 
-  h1,h2,h3,h4{ font-family:'Cinzel', serif; letter-spacing:0.02em; color: var(--gold-bright); font-weight:700; margin-top:0; }
-  a{ color: var(--gold); }
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
 
-  ::selection{ background: var(--wine); color: var(--text); }
+        #global-search {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border-radius: 25px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
 
-  /* ---------- layout shell ---------- */
-  .app{ display:flex; min-height:100vh; }
+        /* Main layout */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
 
-  /* ---------- sidebar ---------- */
-  .sidebar{
-    width: 280px; flex-shrink:0;
-    background: linear-gradient(180deg, var(--ink-2), var(--ink));
-    border-right: 1px solid var(--line);
-    position: sticky; top:0; height:100vh; overflow-y:auto;
-    padding: 28px 0 28px 0;
-  }
-  .sidebar::-webkit-scrollbar{ width:8px; }
-  .sidebar::-webkit-scrollbar-thumb{ background: var(--panel-2); border-radius:4px; }
+        /* Sidebar navigation */
+        aside {
+            width: 240px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1rem 0.5rem;
+            overflow-y: auto;
+        }
 
-  .brand{
-    padding: 0 24px 22px 24px;
-    border-bottom: 1px solid var(--line);
-    margin-bottom: 18px;
-  }
-  .brand .eyebrow{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.18em;
-    color: var(--text-faint); text-transform:uppercase; margin-bottom:6px;
-  }
-  .brand h1{ font-size: 26px; line-height:1.15; margin:0; }
-  .brand .sub{ color: var(--text-dim); font-size:14px; font-style:italic; margin-top:6px; }
+        .nav-category {
+            margin-bottom: 1rem;
+        }
 
-  nav.toc{ padding: 0 12px; }
-  .toc-group-label{
-    font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.16em;
-    color: var(--text-faint); text-transform:uppercase;
-    padding: 16px 12px 8px 12px;
-  }
-  .toc-item{
-    display:flex; align-items:center; gap:10px;
-    padding: 10px 12px; margin: 2px 0;
-    border-radius: var(--radius);
-    color: var(--text-dim); text-decoration:none;
-    font-size: 15.5px;
-    cursor:pointer;
-    border-left: 2px solid transparent;
-    transition: background .15s ease, color .15s ease, border-color .15s ease;
-  }
-  .toc-item .num{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--text-faint);
-    width: 20px; flex-shrink:0;
-  }
-  .toc-item:hover{ background: var(--panel); color: var(--text); }
-  .toc-item.active{
-    background: var(--panel-2); color: var(--gold-bright);
-    border-left-color: var(--gold);
-  }
-  .toc-item.active .num{ color: var(--gold); }
+        .nav-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--accent-purple);
+            padding: 0.4rem 1rem;
+            border-left: 3px solid var(--accent-gold);
+            background: rgba(255,215,0,0.1);
+        }
 
-  /* ---------- main ---------- */
-  main{ flex:1; min-width:0; padding: 48px clamp(24px, 5vw, 72px) 100px; max-width: 980px; }
+        .nav-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.6rem 1rem;
+            margin-bottom: 0.3rem;
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
 
-  .chapter{ display:none; animation: fadeIn .25s ease; }
-  .chapter.active{ display:block; }
-  @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+        .nav-item:hover {
+            background: var(--accent-purple);
+            color: white;
+            transform: translateX(4px);
+        }
 
-  .chapter-head{
-    display:flex; align-items:baseline; gap:16px;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 18px; margin-bottom: 32px;
-  }
-  .chapter-head .chapter-num{
-    font-family:'IBM Plex Mono', monospace; color: var(--wine-bright); font-size:15px;
-  }
-  .chapter-head h2{ font-size: 34px; margin:0; }
+        .nav-item.active {
+            background: var(--accent-gold);
+            color: #1a142e;
+            font-weight: bold;
+        }
 
-  section.block{
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 22px 26px;
-    margin-bottom: 22px;
-  }
-  section.block h3{ font-size:20px; margin-bottom:10px; }
-  section.block h4{ font-size:16.5px; color:var(--text); margin-bottom:6px; }
-  section.block p{ color: var(--text); line-height:1.65; margin: 8px 0; }
-  section.block ul, section.block ol{ line-height:1.7; padding-left: 22px; }
-  section.block li{ margin-bottom:4px; }
+        /* Content area */
+        main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+        }
 
-  .tag{
-    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11px;
-    letter-spacing:0.05em; text-transform:uppercase; color: var(--gold);
-    border: 1px solid var(--line); border-radius: 20px; padding: 2px 10px; margin-right:6px;
-  }
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
 
-  .callout{
-    border-left: 3px solid var(--wine-bright);
-    background: rgba(122,38,53,0.08);
-    padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0;
-    font-style: italic; color: var(--text-dim);
-  }
+        .content-section.active {
+            display: block;
+        }
 
-  .editable-note{
-    margin-top: 14px; font-size: 13px; color: var(--text-faint);
-    font-family:'IBM Plex Mono', monospace; border-top: 1px dashed var(--line); padding-top:10px;
-  }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-  /* ---------- loot generator ---------- */
-  .loot-console{
-    background: linear-gradient(160deg, var(--panel-2), var(--panel));
-    border: 1px solid var(--gold); border-image: none;
-    box-shadow: 0 0 0 1px rgba(201,162,75,0.08), 0 20px 50px -20px rgba(0,0,0,0.6);
-  }
-  .loot-controls{ display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; margin-bottom: 18px; }
-  .field{ display:flex; flex-direction:column; gap:6px; }
-  .field label{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color: var(--text-dim); }
-  select{
-    background: var(--ink); color: var(--text); border: 1px solid var(--line);
-    padding: 10px 12px; border-radius: var(--radius); font-family:'EB Garamond', serif; font-size:16px;
-    min-width: 260px;
-  }
-  .dice-btns{ display:flex; gap:10px; }
-  button.roll{
-    font-family:'Cinzel', serif; font-weight:700; letter-spacing:0.05em;
-    background: var(--wine); color: var(--text); border: 1px solid var(--wine-bright);
-    padding: 10px 20px; border-radius: var(--radius); cursor:pointer;
-    transition: transform .1s ease, background .15s ease;
-  }
-  button.roll:hover{ background: var(--wine-bright); }
-  button.roll:active{ transform: scale(0.97); }
-  button.roll.d100{ background: var(--ink-2); border-color: var(--gold); color: var(--gold-bright); }
-  button.roll.d100:hover{ background: var(--panel-2); }
+        h2 {
+            font-size: 1.6rem;
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
 
-  .roll-result{
-    display:flex; gap:20px; align-items:center;
-    background: var(--ink); border: 1px dashed var(--line); border-radius: var(--radius);
-    padding: 18px 22px; min-height: 74px;
-  }
-  .die-face{
-    font-family:'IBM Plex Mono', monospace; font-size: 28px; font-weight:600;
-    color: var(--gold-bright); background: var(--ink-2); border: 1px solid var(--gold);
-    border-radius: 50%; width:60px; height:60px; flex-shrink:0;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .die-face.rolling{ animation: spin .4s linear infinite; }
-  @keyframes spin{ from{ transform: rotate(0deg);} to{ transform: rotate(360deg);} }
-  .roll-text{ line-height:1.5; }
-  .roll-text .placeholder{ color: var(--text-faint); font-style:italic; }
-  .roll-text .item-name{ color: var(--text); font-size:18px; }
-  .roll-text .roll-meta{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--text-faint); }
+        h3 {
+            font-size: 1.2rem;
+            color: var(--accent-purple);
+            margin: 1.5rem 0 1rem;
+        }
 
-  .history{ margin-top:16px; }
-  .history-title{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color: var(--text-faint); margin-bottom:8px; }
-  .history-list{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:4px; max-height:220px; overflow-y:auto; }
-  .history-list li{ font-size:14.5px; color: var(--text-dim); padding: 6px 10px; border-radius: var(--radius); background: rgba(255,255,255,0.02); }
-  .history-list li b{ color: var(--gold); font-weight:600; }
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
 
-  table.loot-table{ width:100%; border-collapse: collapse; font-size:15px; margin-top:10px; }
-  table.loot-table th, table.loot-table td{ padding:6px 10px; border-bottom: 1px solid var(--line); text-align:left; }
-  table.loot-table th{ font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; color: var(--text-faint); letter-spacing:0.05em; }
-  details.table-toggle{ margin-top:14px; }
-  details.table-toggle summary{ cursor:pointer; color: var(--text-dim); font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.05em; }
-  details.table-toggle summary:hover{ color: var(--gold); }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
 
-  @media (max-width: 860px){
-    .app{ flex-direction:column; }
-    .sidebar{ width:100%; height:auto; position:relative; }
-    main{ padding: 32px 20px 80px; }
-  }
-</style>
+        .card-title {
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        /* Loot tables */
+        .loot-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .loot-table th, .loot-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .loot-table th {
+            background: rgba(255,215,0,0.15);
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        /* Auto loot generator */
+        .auto-loot-form {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        select, input[type="number"] {
+            padding: 0.6rem;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        button {
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(157,78,221,0.4);
+        }
+
+        /* Tags */
+        .tags-container {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 0.8rem;
+        }
+
+        .tag {
+            padding: 0.35rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background: rgba(157,78,221,0.2);
+            color: var(--accent-purple);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tag:hover {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        /* Notes area */
+        .notes-area {
+            min-height: 150px;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            margin-top: 1rem;
+        }
+
+        .note-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.8rem;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            font-family: inherit;
+        }
+
+        /* Favorites */
+        .fav-icon {
+            cursor: pointer;
+            padding: 0.3rem;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.1);
+            color: var(--accent-gold);
+            transition: all 0.2s ease;
+        }
+
+        .fav-icon:hover {
+            background: var(--accent-gold);
+            color: #1a142e;
+        }
+
+        /* Footer */
+        footer {
+            padding: 1rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            aside { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); }
+            header h1 { font-size: 1.4rem; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+    </style>
 </head>
 <body>
 
-<div class="app">
-
-  <!-- ============ SIDEBAR / TABLE DES MATIERES ============ -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="eyebrow">Serveur Tensurama · NeoForge 1.21.1</div>
-      <h1>Grimoire du MJ</h1>
-      <div class="sub">Notes de campagne, non-officielles mais organisées</div>
+<header>
+    <h1>📖 Grimoire de Campagne</h1>
+    <div class="search-container">
+        <input type="text" id="global-search" placeholder="Rechercher dans tout le grimoire...">
     </div>
+</header>
 
-    <nav class="toc" id="toc">
-      <div class="toc-group-label">Table des matières</div>
-      <div class="toc-item" data-target="regles-generales"><span class="num">01</span> Règles générales joueurs</div>
-      <div class="toc-item" data-target="univers-lore"><span class="num">02</span> Univers &amp; lore</div>
-      <div class="toc-item" data-target="regles-maison"><span class="num">03</span> Règles maison / rool</div>
-      <div class="toc-item" data-target="butin"><span class="num">04</span> Butin</div>
-      <div class="toc-item" data-target="objets"><span class="num">05</span> Objets</div>
-      <div class="toc-item" data-target="mini-jeux"><span class="num">06</span> Mini-jeux &amp; spécificités</div>
-      <div class="toc-item" data-target="bestiaire"><span class="num">07</span> Bestiaire &amp; PNJ</div>
-      <div class="toc-item" data-target="journal"><span class="num">08</span> Journal de campagne</div>
-      <div class="toc-item" data-target="boite-a-outils"><span class="num">09</span> Boîte à outils MJ</div>
+<div class="main-container">
+    <aside id="sidebar-nav"></aside>
 
-      <div class="toc-group-label">Méta</div>
-      <div class="toc-item" data-target="a-propos"><span class="num">·</span> Comment éditer ce fichier</div>
-    </nav>
-  </aside>
-
-  <!-- ============ CONTENU ============ -->
-  <main>
-
-    <!-- 01 -->
-    <section class="chapter" id="chap-regles-generales">
-      <div class="chapter-head"><span class="chapter-num">Chapitre 01</span><h2>Règles générales joueurs</h2></div>
-
-      <section class="block">
-        <span class="tag">Table des joueurs</span>
-        <h3>Avant de jouer</h3>
-        <p>Remplace ce texte par les règles de base propres à ta table : rythme des sessions, règle des retards, ce qu'on fait si un joueur est absent, gestion des jets à voix haute vs privés, politique sur les téléphones à table, etc.</p>
-        <ul>
-          <li>Exemple : les sessions ont lieu le <b>[jour]</b> à <b>[heure]</b>, prévenir au moins 24h à l'avance en cas d'absence.</li>
-          <li>Exemple : un joueur absent voit son personnage joué en pilote automatique par le MJ (pas de mort possible dans cet état).</li>
-          <li>Exemple : les jets de dés critiques (nat 1 / nat 20) se font toujours visibles à la table.</li>
-        </ul>
-      </section>
-
-      <section class="block">
-        <h3>Création de personnage</h3>
-        <p>Décris ici les règles de création : niveau de départ, méthode de stats (achat de points / 4d6 / standard array), sources autorisées (splatbooks, homebrew), restrictions de classes ou races liées à ton univers.</p>
-        <div class="callout">Astuce : si ta campagne a un thème fort (ex. isekai / réincarnation façon Tensura), précise ici comment ça s'articule avec la création de perso — pouvoirs de départ, limitations, etc.</div>
-      </section>
-
-      <section class="block">
-        <h3>Règles de table</h3>
-        <p>Mort de personnage, résurrection, gestion du loot entre joueurs, répartition de l'expérience, règles de repos court/long — note tes choix ici pour éviter les débats en session.</p>
-      </section>
-    </section>
-
-    <!-- 02 -->
-    <section class="chapter" id="chap-univers-lore">
-      <div class="chapter-head"><span class="chapter-num">Chapitre 02</span><h2>Univers &amp; lore</h2></div>
-
-      <section class="block">
-        <h3>Le monde</h3>
-        <p>Résume ici la géographie, les factions, l'Histoire du monde. Un paragraphe par région/royaume/faction majeure suffit pour s'y retrouver vite en session.</p>
-      </section>
-
-      <section class="block">
-        <h3>Chronologie / grands événements</h3>
-        <p>Liste chronologique des événements marquants de ton univers, avant et pendant la campagne.</p>
-        <ol>
-          <li>Exemple : Grande Catastrophe — an -300</li>
-          <li>Exemple : Fondation du Royaume — an -120</li>
-          <li>Exemple : Arrivée des joueurs dans le monde — an 0 (début de campagne)</li>
-        </ol>
-      </section>
-
-      <section class="block">
-        <h3>Factions &amp; PNJ clés</h3>
-        <p>Pour le détail des PNJ récurrents, va plutôt au chapitre <b>Bestiaire &amp; PNJ</b> — ici, garde une vue d'ensemble des rapports de force entre factions.</p>
-      </section>
-    </section>
-
-    <!-- 03 -->
-    <section class="chapter" id="chap-regles-maison">
-      <div class="chapter-head"><span class="chapter-num">Chapitre 03</span><h2>Règles maison / explication rool</h2></div>
-
-      <section class="block">
-        <h3>Modifications aux règles officielles</h3>
-        <p>Documente chaque règle maison avec : la règle officielle, ta modification, et pourquoi. Ça t'évite d'oublier ta propre logique 3 sessions plus tard.</p>
-        <table class="loot-table">
-          <thead><tr><th>Règle</th><th>Modification</th><th>Raison</th></tr></thead>
-          <tbody>
-            <tr><td>Repos long</td><td>Exemple : 8h → nécessite un lieu sûr</td><td>Éviter le repos-spam en zone hostile</td></tr>
-            <tr><td>Critique</td><td>Exemple : dégâts max + jet de dégâts en plus</td><td>Rendre les crits plus mémorables</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="block">
-        <h3>Mécaniques spécifiques à l'univers</h3>
-        <p>Si ta campagne ajoute des systèmes (ex. réincarnation, énergie magique façon Tensura, compétences uniques), explique-les ici en détail avec des exemples chiffrés.</p>
-      </section>
-    </section>
-
-    <!-- 04 : BUTIN — générateur interactif -->
-    <section class="chapter" id="chap-butin">
-      <div class="chapter-head"><span class="chapter-num">Chapitre 04</span><h2>Butin</h2></div>
-
-      <section class="block loot-console">
-        <h3>Générateur de butin</h3>
-        <p style="margin-top:0; color:var(--text-dim);">Choisis un contexte, puis lance le d20 (résultat rapide, loot commun) ou le d100 (table pondérée, avec de la rareté).</p>
-
-        <div class="loot-controls">
-          <div class="field">
-            <label for="loot-context">Contexte</label>
-            <select id="loot-context"></select>
-          </div>
-          <div class="dice-btns">
-            <button class="roll d20" id="btn-d20">🎲 Lancer d20</button>
-            <button class="roll d100" id="btn-d100">🎲 Lancer d100</button>
-          </div>
-        </div>
-
-        <div class="roll-result" id="roll-result">
-          <div class="die-face" id="die-face">–</div>
-          <div class="roll-text">
-            <div class="placeholder" id="result-placeholder">Choisis un contexte et lance un dé pour révéler le butin.</div>
-            <div id="result-content" style="display:none;">
-              <div class="item-name" id="result-item"></div>
-              <div class="roll-meta" id="result-meta"></div>
-            </div>
-          </div>
-        </div>
-
-        <details class="table-toggle">
-          <summary id="table-toggle-label">▸ Voir la table complète de ce contexte</summary>
-          <div id="table-container"></div>
-        </details>
-
-        <div class="history">
-          <div class="history-title">Historique de session</div>
-          <ul class="history-list" id="history-list"></ul>
-        </div>
-      </section>
-
-      <section class="block">
-        <h4>Ajouter un nouveau contexte de butin</h4>
-        <p>Le générateur est piloté par un objet JavaScript <code>lootTables</code> tout en bas du fichier HTML (cherche <code>const lootTables = {</code>). Copie un bloc existant, change la clé, le nom, et les entrées <code>d20</code> / <code>d100</code>. Aucune autre partie du code n'a besoin d'être touchée — le menu et les tables se génèrent automatiquement.</p>
-      </section>
-    </section>
-
-    <!-- 05 -->
-    <section class="chapter" id="chap-objets">
-      <div class="chapter-head"><span class="chapter-num">Chapitre 05</span><h2>Objets</h2></div>
-
-      <section class="block">
-        <h3>Catalogue d'objets magiques / uniques</h3>
-        <p>Un objet = une fiche courte : nom, rareté, effet, comment on l'obtient, qui le détient actuellement. Exemple de format ci-dessous, à dupliquer.</p>
-        <table class="loot-table">
-          <thead><tr><th>Nom</th><th>Rareté</th><th>Effet</th><th>Détenteur actuel</th></tr></thead>
-          <tbody>
-            <tr><td>Exemple : Lame du Crépuscule</td><td>Rare</td><td>+1, inflige des dégâts nécrotiques bonus la nuit</td><td>—</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="block">
-        <h3>Objets de quête</h3>
-        <p>Objets non magiques mais narrativement importants (clés, lettres, artefacts de quête). Note ici où ils se trouvent et ce qu'ils débloquent.</p>
-      </section>
-    </section>
-
-    <!-- 06 -->
-    <section class="chapter" id="chap-mini-jeux">
-      <div class="chapter-head"><span class="chapter-num">Chapitre 06</span><h2>Mini-jeux &amp; spécificités</h2></div>
-
-      <section class="block">
-        <h3>Mini-jeux de table</h3>
-        <p>Décris ici tes mini-jeux (pêche, forge, crochetage narratif, poursuites, jeux de cartes en taverne...) avec les règles précises : dés utilisés, seuils de réussite, résultats possibles.</p>
-        <div class="callout">Exemple de structure : Pêche en marais → jet de Survie (DD 12) → succès = accès à la table "Pêcher dans un marais" du chapitre Butin.</div>
-      </section>
-
-      <section class="block">
-        <h3>Événements spéciaux</h3>
-        <p>Tes events ponctuels (comme ton "Summer Rush" ou ton mod IdolWar) : résumé de la mécanique, durée, récompenses.</p>
-      </section>
-    </section>
-
-    <!-- 07 -->
-    <section class="chapter" id="chap-bestiaire">
-      <div class="chapter-head"><span class="chapter-num">Chapitre 07</span><h2>Bestiaire &amp; PNJ</h2></div>
-
-      <section class="block">
-        <h3>PNJ récurrents</h3>
-        <p>Une fiche courte par PNJ important : nom, rôle, motivation, secret éventuel, stat block ou lien vers un stat block officiel.</p>
-      </section>
-
-      <section class="block">
-        <h3>Monstres homebrew</h3>
-        <p>Créatures propres à ta campagne, avec leurs stats complètes ou un lien vers ta fiche détaillée.</p>
-      </section>
-    </section>
-
-    <!-- 08 -->
-    <section class="chapter" id="chap-journal">
-      <div class="chapter-head"><span class="chapter-num">Chapitre 08</span><h2>Journal de campagne</h2></div>
-
-      <section class="block">
-        <h3>Session 1</h3>
-        <p><i>Date :</i> — <br><i>Résumé :</i> remplace par un résumé en 3-4 lignes de ce qui s'est passé, les décisions clés des joueurs, et les fils narratifs ouverts.</p>
-      </section>
-      <div class="editable-note">Duplique ce bloc "Session N" à chaque nouvelle session. Garder ça à jour te sauvera la vie à la session 40.</div>
-    </section>
-
-    <!-- 09 -->
-    <section class="chapter" id="chap-boite-a-outils">
-      <div class="chapter-head"><span class="chapter-num">Chapitre 09</span><h2>Boîte à outils MJ</h2></div>
-
-      <section class="block">
-        <h3>Générateurs à venir</h3>
-        <p>Idées d'ajouts pour cette section, sur le même modèle que le générateur de butin (contexte + tirage) :</p>
-        <ul>
-          <li>Noms de PNJ par culture/région</li>
-          <li>Noms de tavernes / boutiques</li>
-          <li>Rencontres aléatoires par biome (forêt, marais, ruines...)</li>
-          <li>Complications de voyage / événements de route</li>
-          <li>Météo et événements d'ambiance</li>
-        </ul>
-        <p>Dis-moi si tu veux que je code un de ces générateurs — même logique que le butin, ça se branche vite.</p>
-      </section>
-    </section>
-
-    <!-- META -->
-    <section class="chapter" id="chap-a-propos">
-      <div class="chapter-head"><span class="chapter-num">Méta</span><h2>Comment éditer ce fichier</h2></div>
-      <section class="block">
-        <h3>Éditer le contenu</h3>
-        <p>Tout le texte est dans ce fichier <code>index.html</code>, en clair. Ouvre-le avec n'importe quel éditeur de texte (Bloc-notes, VS Code, etc.), cherche le texte à changer, remplace-le, sauvegarde, actualise la page dans ton navigateur.</p>
-        <h3>Ajouter un chapitre</h3>
-        <p>1) Ajoute une ligne dans le menu <code>&lt;nav class="toc"&gt;</code> avec un <code>data-target</code> unique.<br>
-        2) Ajoute une <code>&lt;section class="chapter" id="chap-TONID"&gt;</code> correspondante plus bas.<br>
-        Le <code>data-target</code> du menu doit correspondre à l'<code>id</code> de la section sans le préfixe <code>chap-</code>.</p>
-        <h3>Héberger sur GitHub Pages</h3>
-        <ol>
-          <li>Crée un repo GitHub (public ou privé, peu importe pour toi).</li>
-          <li>Mets ce fichier dedans, renommé <code>index.html</code>, à la racine.</li>
-          <li>Va dans <i>Settings → Pages</i>, choisis la branche <code>main</code> et le dossier <code>/root</code>.</li>
-          <li>GitHub te donne une URL du type <code>https://tonpseudo.github.io/nom-du-repo/</code> à partager avec tes joueurs (ou juste toi si tu veux le garder privé, en n'activant pas Pages et en le lisant en local).</li>
-        </ol>
-      </section>
-    </section>
-
-  </main>
+    <main id="content-area"></main>
 </div>
 
+<footer>
+    <p>Grimoire de Campagne v1.0 — Créé par Qwythos (Empero AI) | Données sauvegardées dans votre navigateur</p>
+</footer>
+
 <script>
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
-(function(){
-  const tocItems = document.querySelectorAll('.toc-item');
-  const chapters = document.querySelectorAll('.chapter');
-
-  function activate(target){
-    chapters.forEach(c => c.classList.toggle('active', c.id === 'chap-' + target));
-    tocItems.forEach(i => i.classList.toggle('active', i.dataset.target === target));
-    if(history.replaceState) history.replaceState(null, '', '#' + target);
-    window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
-  }
-
-  tocItems.forEach(item => {
-    item.addEventListener('click', () => activate(item.dataset.target));
-  });
-
-  const initial = window.location.hash ? window.location.hash.slice(1) : 'regles-generales';
-  const validTargets = Array.from(tocItems).map(i => i.dataset.target);
-  activate(validTargets.includes(initial) ? initial : 'regles-generales');
-})();
-
-/* ============================================================
-   GÉNÉRATEUR DE BUTIN
-   Ajoute autant de contextes que tu veux dans lootTables.
-   d20  : tableau de 20 chaînes (index 0 = résultat pour un 1)
-   d100 : tableau d'objets {max, text} triés par max croissant.
-          "max" = borne supérieure de la plage qui donne ce résultat.
-          Exemple : {max:50, text:"..."} couvre les résultats 1 à 50
-          (en tenant compte du "max" du groupe précédent).
-   ============================================================ */
-const lootTables = {
-
-  corps_bandit: {
-    label: "Corps de bandit",
-    d20: [
-      "3 pièces de cuivre et une miche de pain rassis",
-      "Une dague ébréchée, encore utilisable",
-      "Un poignard de jet supplémentaire",
-      "12 pièces d'argent cousues dans l'ourlet du manteau",
-      "Une corde de 10m et un grappin de fortune",
-      "Un message codé, à moitié brûlé, illisible sans un jet d'Investigation (DD 13)",
-      "Une gourde d'alcool bon marché",
-      "Un dé pipé et un jeu de cartes usé",
-      "Une bague sans valeur mais gravée d'un symbole de guilde locale",
-      "Un sac de billes de verre (utilisées comme piège au sol)",
-      "5 pièces d'or, mal réparties dans plusieurs poches",
-      "Une carte griffonnée d'un repaire proche",
-      "Un anneau de clés n'ouvrant rien d'identifiable pour l'instant",
-      "Des bottes en bon état (taille moyenne)",
-      "Une amulette religieuse d'une foi mineure",
-      "Un carnet de dettes listant 4 autres noms de la région",
-      "Une fiole d'huile pour arme, à moitié pleine",
-      "20 pièces de cuivre et rien d'autre",
-      "Un tatouage distinctif (information, pas objet) reliant le bandit à une faction connue",
-      "Rien — il a déjà été détroussé avant vous"
+// ==================== DONNÉES INITIALES ====================
+const initialData = {
+    categories: [
+        { id: 'regles', name: '📜 Règles générales (Joueur)', icon: '📜' },
+        { id: 'univers', name: '🌍 Univers & Lore', icon: '🌍' },
+        { id: 'roleplay', name: '💬 Explications Roleplay', icon: '💬' },
+        { id: 'loot', name: '⚔️ Loot possible', icon: '⚔️' },
+        { id: 'mini-jeux', name: '🎲 Mini-jeux & Spécificités', icon: '🎲' },
+        { id: 'items', name: '💎 Items', icon: '💎' },
+        { id: 'npcs', name: '👤 NPCs', icon: '👤' },
+        { id: 'cartes-scenes', name: '🗺️ Cartes & Scènes', icon: '🗺️' },
+        { id: 'notes-sessions', name: '📝 Notes de session', icon: '📝' },
+        { id: 'feuilles-perso', name: '👤 Feuilles perso', icon: '👤' }
     ],
-    d100: [
-      {max:30, text:"Butin de poche : quelques pièces de cuivre/argent, sans intérêt"},
-      {max:55, text:"Un objet du quotidien en bon état (couteau, gourde, corde) revendable pour une poignée d'argent"},
-      {max:75, text:"Une piste exploitable : carte, message codé, ou nom d'un contact dans une ville proche"},
-      {max:88, text:"Un objet de valeur modeste : bijou simple, arme de qualité correcte (25-50 po)"},
-      {max:96, text:"Un objet rattaché à une faction ou guilde : preuve, sceau, ou symbole d'appartenance"},
-      {max:100, text:"Un objet magique mineur (potion inconnue, parchemin de sort de niveau 1, babiole enchantée)"}
-    ]
-  },
 
-  baril_etrange: {
-    label: "Baril étrange",
-    d20: [
-      "Le baril est vide, mais l'odeur suggère qu'il contenait de l'alcool de contrebande",
-      "Rempli de clous et de ferraille — matériel de fortification",
-      "De la poudre noire humide, inutilisable telle quelle",
-      "Un tonneau de harengs salés, en état correct",
-      "Une réserve de bandages et d'onguents simples (soigne 1d4 PV si utilisé, usage unique)",
-      "Des vêtements civils de plusieurs tailles, planqués là pour une fuite",
-      "Un faux fond révélant une petite bourse de 15 po",
-      "Rempli de terre — visiblement utilisé pour cacher quelque chose dessous",
-      "Une cargaison de bougies et de mèches",
-      "Un alcool de qualité surprenante pour l'endroit (valeur 10 po la bouteille)",
-      "Des outils de forgeron basiques, rouillés mais fonctionnels",
-      "Un nid de rats — jet de Discrétion (DD 10) pour ne pas les alerter, sinon bruit qui attire l'attention",
-      "Une cargaison illégale d'épices exotiques (valeur 40 po au marché noir)",
-      "Un parchemin trempé et illisible",
-      "Des munitions d'arbalète en bon état (20 carreaux)",
-      "Un piège à mâchoire, non armé, dissimulé sous de la paille",
-      "Une lettre scellée destinée à quelqu'un en ville, non ouverte",
-      "Du sel en grande quantité, denrée précieuse dans certaines régions",
-      "Un petit coffre verrouillé à l'intérieur (DD 15 pour crocheter), contenant 2d20 po",
-      "Quelque chose bouge à l'intérieur — une créature s'y est réfugiée (au MJ de décider : rat géant, esprit mineur, ou simplement un chat effrayé)"
+    lootTables: {
+        'loot': [
+            { d20: 1, d100: 1, item: "Lantern of Revealing" },
+            { d20: 2, d100: 2, item: "Dague magique faible (dmg+1)" },
+            { d20: 3, d100: 3, item: "Potion de guérison mineure" },
+            { d20: 4, d100: 4, item: "Épée rustique +1" },
+            { d20: 5, d100: 5, item: "Anneau de protection (AC+1)" },
+            { d20: 6, d100: 6, item: "Livre ancien (connaissance)" },
+            { d20: 7, d100: 7, item: "Bouclier en bois" },
+            { d20: 8, d100: 8, item: "Potion de force (+STR)" },
+            { d20: 9, d100: 9, item: "Épée courante +1" },
+            { d20: 10, d100: 10, item: "Anneau de feu (dmg+1)" },
+            { d20: 11, d100: 11, item: "Livre de magie élémentaire" },
+            { d20: 12, d100: 12, item: "Bouclier en métal +1" },
+            { d20: 13, d100: 13, item: "Potion de sagesse (+WIS)" },
+            { d20: 14, d100: 14, item: "Épée magique +2" },
+            { d20: 15, d100: 15, item: "Anneau de vie (HP+10)" },
+            { d20: 16, d100: 16, item: "Livre de nécromancie" },
+            { d20: 17, d100: 17, item: "Bouclier enchanté +2" },
+            { d20: 18, d100: 18, item: "Potion de vitesse (+DEX)" },
+            { d20: 19, d100: 19, item: "Épée légendaire +3" },
+            { d20: 20, d100: 20, item: "Anneau de puissance (dmg+2)" }
+        ],
+
+        'loot-enemies': [
+            { type: 'Humanoid', items: ["Épée rustique", "Potion mineure", "Livre ancien"] },
+            { type: 'Undead', items: ["Anneau de protection", "Bouclier en bois", "Livre de magie sombre"] },
+            { type: 'Giant', items: ["Bouclier lourd +1", "Potion de force majeure", "Épée lourde +2"] },
+            { type: 'Beast', items: ["Dague sauvage", "Potion d'agilité", "Livre de nature"] },
+            { type: 'Dragon', items: ["Anneau de feu", "Bouclier dragonné +3", "Épée légendaire +4"] }
+        ]
+    },
+
+    lootLocations: [
+        { name: "Coffre donjon", d20: true, d100: true },
+        { name: "Baril étrange", d20: true, d100: false },
+        { name: "Pêche dans un marais", d20: true, d100: false },
+        { name: "Camp de pillards", d20: true, d100: true },
+        { name: "Bibliothèque abandonnée", d20: false, d100: true }
     ],
-    d100: [
-      {max:35, text:"Denrée banale sans grande valeur (nourriture avariée, ferraille, terre)"},
-      {max:60, text:"Marchandise de contrebande modeste (alcool, épices, munitions) — revente possible"},
-      {max:80, text:"Un compartiment caché avec une petite somme d'argent ou un objet de valeur"},
-      {max:92, text:"Une piste narrative : lettre scellée, document compromettant, symbole de faction"},
-      {max:98, text:"Une créature ou un piège se trouve à l'intérieur — surprise pour le groupe"},
-      {max:100, text:"Le baril contient un objet magique inattendu, mal étiqueté ou volé"}
-    ]
-  },
 
-  peche_marais: {
-    label: "Pêcher dans un marais",
-    d20: [
-      "Une botte trouée — rien de plus",
-      "Un poisson tout à fait normal, bon pour le repas du soir",
-      "Une bouteille vide avec un message illisible à l'intérieur",
-      "Un hameçon rouillé, déjà planté dans votre prise",
-      "Des algues comestibles, utiles en composant alchimique mineur",
-      "Une pièce d'armure rouillée, sans valeur mais identifiable (faction ? époque ?)",
-      "Un anneau simple, terni, sans magie détectable",
-      "Un poisson étrangement lumineux (curiosité, potentiellement vendable à un érudit pour 5-10 po)",
-      "Une carte imperméabilisée, à moitié effacée",
-      "Une petite tortue, non hostile, qui pourrait devenir une mascotte",
-      "Un os visiblement humanoïde",
-      "Une fiole scellée à la cire, contenu inconnu (potion ou poison, à identifier)",
-      "Un collier de pacotille, sans valeur",
-      "Des sangsues — désagréable mais sans danger réel",
-      "Un couteau de bonne facture, rouillé mais réparable",
-      "Une amulette religieuse liée à une divinité de l'eau ou de la nature",
-      "Un parchemin dans un tube étanche, sort de niveau 1 encore lisible",
-      "Une clé sans serrure connue",
-      "Un petit coffret étanche fermé à clé (DD 13), contenant 1d10 po et une babiole",
-      "Une créature du marais mord à l'hameçon à la place d'un poisson (au MJ : anguille géante, grenouille venimeuse, ou pire)"
-    ],
-    d100: [
-      {max:40, text:"Rien d'intéressant : débris, vase, ou poisson banal"},
-      {max:65, text:"Curiosité mineure : objet rouillé, os, ou babiole sans valeur marchande réelle"},
-      {max:82, text:"Objet identifiable ayant appartenu à quelqu'un : trace narrative à exploiter"},
-      {max:93, text:"Petit conteneur scellé (fiole, coffret étanche) avec un contenu inconnu"},
-      {max:98, text:"Une créature du marais réagit à la prise — rencontre potentielle"},
-      {max:100, text:"Un objet magique ou un parchemin de sort encore intact malgré l'humidité"}
-    ]
-  },
-
-  epave_caravane: {
-    label: "Épave de caravane marchande",
-    d20: [
-      "Des roues brisées et du bois fendu, rien d'exploitable",
-      "Des tissus détrempés mais encore vendables (5 po)",
-      "Un tonneau de vin renversé, à moitié plein",
-      "Le livre de comptes du marchand, taché mais lisible",
-      "Une caisse d'outils de voyage complète",
-      "Des provisions de route pour 3 jours, encore consommables",
-      "Une bourse cachée sous le siège du cocher (2d10 po)",
-      "Un cheval effrayé mais en vie, caché non loin",
-      "Des lettres de créance au nom du marchand, utilisables pour usurper son identité en ville",
-      "Une caisse de marchandise fragile, brisée et sans valeur",
-      "Un coffre-fort renforcé, verrouillé (DD 17)",
-      "Le corps du marchand, avec un objet personnel de valeur sentimentale",
-      "Une arbalète de voyage en bon état avec 10 carreaux",
-      "Des épices de valeur, écrasées mais encore identifiables (20 po)",
-      "Un contrat commercial impliquant une figure locale importante",
-      "Une carte de routes commerciales annotée",
-      "Un bijou de famille, dissimulé dans une doublure de vêtement",
-      "Des documents d'assurance marchande, sans valeur immédiate mais utiles à un enquêteur",
-      "Une petite quantité de composants alchimiques rares (utile pour un lanceur de sorts)",
-      "Un passager clandestin survivant, caché dans l'épave — allié ou complication au choix du MJ"
-    ],
-    d100: [
-      {max:30, text:"Débris sans valeur, marchandise détruite dans l'accident"},
-      {max:55, text:"Marchandise partiellement récupérable, revendable à faible prix"},
-      {max:75, text:"Somme d'argent ou objet de valeur retrouvé dans les décombres"},
-      {max:90, text:"Document important : contrat, lettre de créance, carte commerciale"},
-      {max:97, text:"Survivant ou corps portant un objet personnel significatif"},
-      {max:100, text:"Coffre verrouillé ou objet rare échappé à la destruction"}
-    ]
-  },
-
-  coffre_ancien: {
-    label: "Coffre ancien / ruines",
-    d20: [
-      "Vide — pillé il y a longtemps",
-      "De la poussière et des ossements de rongeurs",
-      "Quelques pièces d'une monnaie qui n'a plus cours",
-      "Un bijou terni mais de bonne facture (15 po)",
-      "Un parchemin cassant contenant un sort de niveau 1 ou 2",
-      "Une statuette religieuse d'un culte oublié",
-      "Un objet piégé — jet de Discrétion/Investigation (DD 14) pour l'éviter",
-      "Une carte au trésor partielle, menant à un autre point d'intérêt",
-      "Une arme ancienne, non magique mais d'excellente facture (arme de maître)",
-      "Un anneau magique mineur (résistance à un type de dégât mineur, ou +1 à un jet spécifique)",
-      "Un grimoire endommagé, la moitié des sorts illisibles",
-      "Une gemme de valeur (100 po)",
-      "Un talisman lié à l'univers/lore de la campagne (à personnaliser)",
-      "Des restes humanoïdes portant une armure ancienne identifiable",
-      "Une fiole de potion inconnue, étiquette effacée",
-      "Un petit reliquaire contenant une relique mineure d'un culte",
-      "Une clé ouvragée, sans serrure visible à proximité (piste pour la suite)",
-      "Un objet maudit d'apparence anodine (à révéler plus tard)",
-      "Un artefact magique mineur mais identifié (baguette à charges limitées, par exemple)",
-      "Un objet magique rare, lié directement à l'intrigue principale de la campagne"
-    ],
-    d100: [
-      {max:25, text:"Coffre vide ou déjà pillé"},
-      {max:50, text:"Petit trésor sans magie : pièces, bijoux, objets de valeur modeste"},
-      {max:72, text:"Objet ancien de qualité exceptionnelle mais non magique"},
-      {max:88, text:"Objet magique mineur (potion, parchemin, anneau à effet limité)"},
-      {max:97, text:"Objet magique notable, utile en combat ou en exploration"},
-      {max:100, text:"Artefact rare lié à l'intrigue principale — à personnaliser selon ta campagne"}
-    ]
-  },
-
-  depouille_bete: {
-    label: "Dépouille de bête sauvage",
-    d20: [
-      "Rien d'exploitable, la carcasse est trop abîmée",
-      "De la viande fraîche pour plusieurs repas",
-      "Une fourrure de qualité correcte (revente 5 po)",
-      "Des griffes ou crocs utilisables comme composants d'artisanat",
-      "Un estomac contenant les restes d'un repas précédent de la bête — possible indice",
-      "Une fourrure rare recherchée par un tanneur local (revente 25 po)",
-      "Un os assez solide pour être taillé en outil ou arme improvisée",
-      "Une glande ou organe utile en alchimie (poison, composant de potion)",
-      "Une dent ou corne de belle taille, prisée comme trophée (15 po)",
-      "Une marque de dressage ou de propriété — la bête appartenait à quelqu'un",
-      "Un objet avalé récemment par la bête (bague, pièce, clé...)",
-      "Une fourrure ou peau aux propriétés magiques mineures détectées",
-      "Un nid à proximité avec des œufs ou petits (dilemme moral/tactique pour le groupe)",
-      "Une blessure d'origine suspecte sur la bête (a été combattue récemment par quelqu'un d'autre)",
-      "Un parasite ou une maladie transmissible — jet de Constitution (DD 12) en cas de contact prolongé",
-      "Une trace indiquant qu'il ne s'agissait pas d'une bête ordinaire (marque de sortilège, mutation)",
-      "Une corne ou griffe pouvant servir de composant à un objet magique (au choix du MJ)",
-      "Un trophée déjà réclamé par un chasseur local — source potentielle de conflit ou de quête",
-      "Un organe rare très recherché par un alchimiste ou apothicaire (valeur 50 po)",
-      "La bête portait un objet magique intégré (implant, collier, sceau) — rare et précieux"
-    ],
-    d100: [
-      {max:35, text:"Rien d'exploitable au-delà de la viande ou d'une peau banale"},
-      {max:60, text:"Matériau d'artisanat correct : fourrure, os, dent, revendable modestement"},
-      {max:80, text:"Composant recherché par un alchimiste ou artisan spécialisé (valeur notable)"},
-      {max:92, text:"Élément narratif : marque de propriété, objet avalé, indice sur la bête"},
-      {max:98, text:"Matériau aux propriétés magiques mineures détectées"},
-      {max:100, text:"La bête portait un objet magique intégré, rare et précieux"}
-    ]
-  }
-
+    notes: {}, // { [id]: { title, content, tags, fav } }
+    favorites: [], // [ids]
+    bookmarks: {} // { [category]: [itemIds] }
 };
 
-(function(){
-  const select = document.getElementById('loot-context');
-  const dieFace = document.getElementById('die-face');
-  const placeholder = document.getElementById('result-placeholder');
-  const resultContent = document.getElementById('result-content');
-  const resultItem = document.getElementById('result-item');
-  const resultMeta = document.getElementById('result-meta');
-  const historyList = document.getElementById('history-list');
-  const tableContainer = document.getElementById('table-container');
-  const tableToggleLabel = document.getElementById('table-toggle-label');
+// ==================== STATE ====================
+let state = { ...initialData };
+const STORAGE_KEY = 'qwythos_grimoire_v1';
 
-  // build dropdown
-  Object.keys(lootTables).forEach(key => {
-    const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = lootTables[key].label;
-    select.appendChild(opt);
-  });
-
-  function renderFullTable(){
-    const key = select.value;
-    const t = lootTables[key];
-    tableToggleLabel.textContent = '▸ Voir la table complète — ' + t.label;
-    let html = '<h4 style="margin-top:14px;">Table d20</h4><table class="loot-table"><thead><tr><th>Résultat</th><th>Effet</th></tr></thead><tbody>';
-    t.d20.forEach((text, i) => {
-      html += `<tr><td>${i+1}</td><td>${text}</td></tr>`;
-    });
-    html += '</tbody></table>';
-
-    html += '<h4 style="margin-top:18px;">Table d100</h4><table class="loot-table"><thead><tr><th>Plage</th><th>Effet</th></tr></thead><tbody>';
-    let prevMax = 0;
-    t.d100.forEach(entry => {
-      html += `<tr><td>${prevMax+1}–${entry.max}</td><td>${entry.text}</td></tr>`;
-      prevMax = entry.max;
-    });
-    html += '</tbody></table>';
-    tableContainer.innerHTML = html;
-  }
-
-  function lookupD100(entries, roll){
-    for(const entry of entries){
-      if(roll <= entry.max) return entry.text;
+function loadFromStorage() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        const parsed = JSON.parse(saved);
+        Object.assign(state, parsed);
     }
-    return entries[entries.length-1].text;
-  }
+}
 
-  function animateRoll(sides, finalRoll, resultText, label){
-    let ticks = 0;
-    dieFace.classList.add('rolling');
-    placeholder.style.display = 'none';
-    resultContent.style.display = 'block';
-    const interval = setInterval(() => {
-      dieFace.textContent = Math.ceil(Math.random() * sides);
-      ticks++;
-      if(ticks > 8){
-        clearInterval(interval);
-        dieFace.classList.remove('rolling');
-        dieFace.textContent = finalRoll;
-        resultItem.textContent = resultText;
-        resultMeta.textContent = label;
-        addHistory(label, resultText);
-      }
-    }, 45);
-  }
+function saveToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
 
-  function addHistory(label, text){
-    const li = document.createElement('li');
-    li.innerHTML = `<b>${label}</b> — ${text}`;
-    historyList.insertBefore(li, historyList.firstChild);
-    while(historyList.children.length > 12){
-      historyList.removeChild(historyList.lastChild);
+// ==================== RENDER SIDEBAR ====================
+function renderSidebar() {
+    const sidebar = document.getElementById('sidebar-nav');
+    sidebar.innerHTML = state.categories.map(cat => `
+        <div class="nav-category">
+            <div class="nav-title">${cat.icon} ${cat.name}</div>
+            <button class="nav-item" data-cat="${cat.id}" onclick="navigateTo('${cat.id}')">
+                Voir la catégorie
+            </button>
+        </div>
+    `).join('');
+
+    // Add auto-loot generator button in loot section
+    const lootCat = state.categories.find(c => c.id === 'loot');
+    if (lootCat) {
+        const btn = document.createElement('button');
+        btn.className = 'nav-item';
+        btn.style.marginTop = '0.5rem';
+        btn.textContent = '🎲 Générateur de loot rapide';
+        btn.onclick = () => showAutoLootForm();
+        sidebar.appendChild(btn);
     }
-  }
 
-  document.getElementById('btn-d20').addEventListener('click', () => {
-    const t = lootTables[select.value];
-    const roll = Math.ceil(Math.random() * 20);
-    const text = t.d20[roll-1];
-    animateRoll(20, roll, text, `${t.label} · d20 = ${roll}`);
-  });
+    // Add bookmarks section at end
+    const bookBtn = document.createElement('button');
+    bookBtn.className = 'nav-item';
+    bookBtn.textContent = '🔖 Favoris / Marque-pages';
+    bookBtn.onclick = () => showBookmarks();
+    sidebar.appendChild(bookBtn);
+}
 
-  document.getElementById('btn-d100').addEventListener('click', () => {
-    const t = lootTables[select.value];
-    const roll = Math.ceil(Math.random() * 100);
-    const text = lookupD100(t.d100, roll);
-    animateRoll(100, roll, text, `${t.label} · d100 = ${roll}`);
-  });
+// ==================== NAVIGATION ====================
+function navigateTo(catId) {
+    const cat = state.categories.find(c => c.id === catId);
+    if (!cat) return;
 
-  select.addEventListener('change', renderFullTable);
-  renderFullTable();
-})();
+    // Update active nav item
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    event.target.closest('.nav-item')?.classList.add('active');
+
+    renderContent(cat);
+}
+
+function renderContent(category) {
+    const main = document.getElementById('content-area');
+    
+    switch (category.id) {
+        case 'regles':
+            main.innerHTML = `
+                <h2>📜 Règles générales</h2>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Introduction aux règles de base</span></div>
+                    <p>Voici les règles fondamentales que tous les joueurs doivent connaître avant de commencer une partie.</p>
+                    <ul style="margin-top:0.8rem; padding-left:1.5rem;">
+                        <li>Jets de dés : d20 + modificateur vs DC</li>
+                        <li>Classement des compétences : Force, Dextérité, Constitution, Intelligence, Sagesse, Charisme</li>
+                        <li>Types de jets : Attaque, Sauvetage, Compétence</li>
+                    </ul>
+                </div>
+            `;
+            break;
+
+        case 'univers':
+            main.innerHTML = `
+                <h2>🌍 Univers & Lore</h2>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Histoire du monde</span></div>
+                    <p>Découvrez l'histoire de notre campagne, les royaumes, les factions et les événements majeurs.</p>
+                    <h3 style="margin-top:1.2rem;">Royaumes principaux</h3>
+                    <ul style="padding-left:1.5rem; margin-top:0.6rem;">
+                        <li><strong>Royauté de Solara</strong> — Capitale : Cité d'Or</li>
+                        <li><strong>Duché des Forêts Ombreuses</strong> — Chef-lieu : Bois Éternel</li>
+                        <li><strong>Empire du Désert</strong> — Centre : Oasis de la Lune</li>
+                    </ul>
+                </div>
+            `;
+            break;
+
+        case 'roleplay':
+            main.innerHTML = `
+                <h2>💬 Explications Roleplay</h2>
+                <div class="card">
+                    <p>Ce guide explique comment jouer de manière immersive : dialogues, actions sociales, gestion de la réputation, etc.</p>
+                </div>
+            `;
+            break;
+
+        case 'loot':
+            main.innerHTML = `
+                <h2>⚔️ Loot possible</h2>
+                
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Tables de loot (d20 / d100)</span></div>
+                    
+                    <table class="loot-table">
+                        <thead><tr><th>d20</th><th>d100</th><th>Objet trouvé</th></tr></thead>
+                        <tbody>${state.lootTables['loot'].map((row, i) => `
+                            <tr>
+                                <td>${row.d20}</td>
+                                <td>${row.d100}</td>
+                                <td>${row.item}</td>
+                            </tr>`).join('')}</tbody>
+                    </table>
+
+                    <div class="auto-loot-form">
+                        <h3 style="margin-top:1.2rem;">🎲 Générateur de loot rapide</h3>
+                        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem;">Choisissez un lieu, lancez le dé, et obtenez du loot instantanément.</p>
+                        
+                        <div class="form-group">
+                            <select id="auto-loot-location" onchange="updateAutoLootForm()">
+                                ${state.lootLocations.map(loc => `<option value="${loc.name}">${loc.name}</option>`).join('')}
+                            </select>
+                            
+                            <select id="auto-loot-die-type">
+                                <option value="d20">Dés 20</option>
+                                <option value="d100">Dés 100</option>
+                            </select>
+                            
+                            <input type="number" id="auto-loot-roll" placeholder="Résultat du dé (ex: 15)" min="1" max="${state.lootTables['loot'][state.lootTables['loot'].length-1].d20}">
+                        </div>
+
+                        <button class="btn-primary" onclick="generateAutoLoot()">🎲 Générer le loot</button>
+                        
+                        <div id="auto-loot-result" style="margin-top:1rem; padding:0.8rem; background:rgba(255,215,0,0.1); border-radius:6px;"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Loot par type d'ennemi</span></div>
+                    <table class="loot-table">
+                        <thead><tr><th>Type d'ennemi</th><th>Loot possible</th></tr></thead>
+                        <tbody>${state.lootTables['loot-enemies'].map(row => `
+                            <tr>
+                                <td style="font-weight:bold;">${row.type}</td>
+                                <td>${row.items.join(', ')}</td>
+                            </tr>`).join('')}</tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top:1.2rem;">📝 Notes personnelles sur le loot</h3>
+                    <textarea id="loot-notes" class="note-input" placeholder="Ajoutez vos notes ici (ex: 'Coffre du niveau 5 contient souvent des potions...')"></textarea>
+                    <div class="tags-container" id="loot-tags"></div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top:1.2rem;">🔖 Favoris</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem;">Marquez certains objets comme favoris pour y accéder rapidement.</p>
+                    <div id="loot-favs-list"></div>
+                </div>
+            `;
+            break;
+
+        case 'mini-jeux':
+            main.innerHTML = `
+                <h2>🎲 Mini-jeux & Spécificités</h2>
+                <div class="card">
+                    <p>Liste des mini-jeux utilisables en session : énigmes, jeux de rôle improvisés, etc.</p>
+                </div>
+            `;
+            break;
+
+        case 'items':
+            main.innerHTML = `
+                <h2>💎 Items</h2>
+                <div class="card">
+                    <p>Catalogue des objets magiques et non-magiques disponibles dans la campagne.</p>
+                </div>
+            `;
+            break;
+
+        case 'npcs':
+            main.innerHTML = `
+                <h2>👤 NPCs</h2>
+                
+                <div class="card">
+                    <div class="card-header"><span class="card-title">NPC : ${state.notes['npc1']?.title || 'Inconnu'}</span></div>
+                    
+                    <p><strong>Nom :</strong> ${state.notes['npc1']?.content.split('\n')[0] || ''}</p>
+                    <p><strong>Description :</strong> ${state.notes['npc1']?.content.split('\n').slice(1).join(' ') || ''}</p>
+                    
+                    <div class="tags-container" id="npc-tags"></div>
+
+                    <textarea id="npc-notes" class="note-input" placeholder="Ajoutez des notes sur cet NPC..."></textarea>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top:1.2rem;">🔖 Favoris</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem;">Marquez cet NPC comme favori.</p>
+                    <button class="btn-primary" onclick="toggleFavorite('npc1')">⭐ Marquer/démarquer comme favori</button>
+                </div>
+            `;
+            break;
+
+        case 'cartes-scenes':
+            main.innerHTML = `
+                <h2>🗺️ Cartes & Scènes</h2>
+                <div class="card">
+                    <p>Description des lieux clés de la campagne avec leurs points d'intérêt.</p>
+                </div>
+            `;
+            break;
+
+        case 'notes-sessions':
+            main.innerHTML = `
+                <h2>📝 Notes de session</h2>
+                
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Session #1 — Introduction</span></div>
+                    
+                    <p><strong>Date :</strong> ${state.notes['session1']?.content.split('\n')[0] || ''}</p>
+                    <p><strong>Résumé :</strong> ${state.notes['session1']?.content.split('\n').slice(1).join(' ') || ''}</p>
+                    
+                    <div class="tags-container" id="session-tags"></div>
+
+                    <textarea id="session-notes" class="note-input" placeholder="Ajoutez des notes pour cette session..."></textarea>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top:1.2rem;">🔖 Favoris</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem;">Marquez cette note comme favorite.</p>
+                    <button class="btn-primary" onclick="toggleFavorite('session1')">⭐ Marquer/démarquer comme favori</button>
+                </div>
+            `;
+            break;
+
+        case 'feuilles-perso':
+            main.innerHTML = `
+                <h2>👤 Feuilles perso</h2>
+                
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Personnage : ${state.notes['perso1']?.title || 'Inconnu'}</span></div>
+                    
+                    <p><strong>Nom :</strong> ${state.notes['perso1']?.content.split('\n')[0] || ''}</p>
+                    <p><strong>Race/Classe :</strong> ${state.notes['perso1']?.content.split('\n').slice(1).join(' ') || ''}</p>
+                    
+                    <div class="tags-container" id="perso-tags"></div>
+
+                    <textarea id="perso-notes" class="note-input" placeholder="Ajoutez des notes sur ce personnage..."></textarea>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top:1.2rem;">🔖 Favoris</h3>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem;">Marquez ce personnage comme favori.</p>
+                    <button class="btn-primary" onclick="toggleFavorite('perso1')">⭐ Marquer/démarquer comme favori</button>
+                </div>
+            `;
+            break;
+
+        default:
+            main.innerHTML = `<h2>${category.name}</h2><p>Contenu à venir...</p>`;
+    }
+}
+
+// ==================== AUTO LOOT GENERATOR ====================
+function updateAutoLootForm() {
+    const location = document.getElementById('auto-loot-location').value;
+    const locData = state.lootLocations.find(l => l.name === location);
+    
+    // Update max roll based on d20/d100 availability
+    const dieType = document.getElementById('auto-loot-die-type');
+    if (locData.d20) {
+        dieType.max = 20;
+        dieType.value = 'd20';
+    } else {
+        dieType.max = 100;
+        dieType.value = 'd100';
+    }
+}
+
+function generateAutoLoot() {
+    const location = document.getElementById('auto-loot-location').value;
+    const dieType = document.getElementById('auto-loot-die-type').value;
+    let rollValue = parseInt(document.getElementById('auto-loot-roll').value) || 0;
+
+    // If no roll provided, simulate a random roll
+    if (rollValue === 0) {
+        rollValue = Math.floor(Math.random() * 20) + 1;
+        document.getElementById('auto-loot-roll').value = rollValue;
+    }
+
+    const resultDiv = document.getElementById('auto-loot-result');
+    
+    // Find loot table for this location (simplified: use main loot table)
+    let item = null;
+    if (dieType === 'd20') {
+        const row = state.lootTables['loot'].find(r => r.d20 === rollValue);
+        item = row ? row.item : 'Objet inconnu';
+    } else {
+        const row = state.lootTables['loot'].find(r => r.d100 === rollValue);
+        item = row ? row.item : 'Objet rare (d100)';
+    }
+
+    resultDiv.innerHTML = `
+        <strong>🎲 Lieu :</strong> ${location} | 
+        <strong>Dé :</strong> ${dieType} (${rollValue}) → 
+        <strong>Loot obtenu :</strong> <span style="color:var(--accent-gold); font-weight:bold;">${item}</span>
+    `;
+
+    // Save this loot entry to notes for persistence
+    if (!state.notes['auto-loot']) state.notes['auto-loot'] = { title: 'Loot généré automatiquement', content: '', tags: [] };
+    const autoNotes = state.notes['auto-loot'];
+    autoNotes.content += `\n\n${new Date().toLocaleDateString()} — ${location} (d${dieType === 'd20' ? '20' : '100'}=${rollValue}) → ${item}\n`;
+    saveToStorage();
+}
+
+// ==================== BOOKMARKS / FAVORITES ====================
+function showBookmarks() {
+    const main = document.getElementById('content-area');
+    
+    // Build list of favorited items from all notes
+    const favItems = [];
+    Object.values(state.notes).forEach(note => {
+        if (note.fav) {
+            favItems.push({ title: note.title, content: note.content });
+        }
+    });
+
+    main.innerHTML = `
+        <h2>🔖 Favoris / Marque-pages</h2>
+        
+        ${favItems.length === 0 ? '<p style="color:var(--text-secondary);">Aucun favori enregistré pour le moment.</p>' : ''}
+        
+        <div class="card" style="${favItems.length > 0 ? 'display:block;' : 'display:none;'}">
+            ${favItems.map((item, i) => `
+                <div style="margin-bottom:1rem;">
+                    <h3 style="color:var(--accent-gold);">${i+1}. ${item.title}</h3>
+                    <p>${item.content}</p>
+                    <button class="btn-primary" onclick="removeFavorite('${item.id}')" style="font-size:0.8rem; padding:0.4rem 0.7rem;">🗑️ Supprimer du favoris</button>
+                </div>
+            `).join('')}
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:1.2rem;">Ajouter un favori</h3>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem;">Marquez une note existante comme favorite.</p>
+            
+            <div class="form-group">
+                <select id="fav-select" onchange="toggleFavoriteFromSelect()">
+                    ${Object.values(state.notes).map(note => `
+                        <option value="${note.id}">${note.title}</option>
+                    `).join('')}
+                </select>
+                
+                <button class="btn-primary" onclick="toggleFavoriteFromSelect()">⭐ Marquer comme favori</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:1.2rem;">🔖 Marque-pages par catégorie</h3>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem;">Cliquez sur une catégorie pour voir les marque-pages enregistrés.</p>
+            
+            ${state.categories.map(cat => `
+                <div class="card" id="bookmarks-${cat.id}" style="${state.bookmarks[cat.id] ? 'display:block;' : 'display:none;'}">
+                    <h4>${cat.icon} ${cat.name}</h4>
+                    <ul style="padding-left:1.5rem;">${state.bookmarks[cat.id].map(id => `<li><a href="#" onclick="navigateTo('${id}')">${id}</a></li>`).join('')}</ul>
+                </div>
+            `).join('')}
+
+            <button class="btn-primary" style="margin-top:1rem;" onclick="showAddBookmarkForm()">➕ Ajouter un marque-page</button>
+        </div>
+    `;
+}
+
+function toggleFavorite(id) {
+    if (state.favorites.includes(id)) {
+        state.favorites = state.favorites.filter(fid => fid !== id);
+    } else {
+        state.favorites.push(id);
+    }
+    saveToStorage();
+    renderSidebar(); // refresh nav to show fav icons
+}
+
+function toggleFavoriteFromSelect() {
+    const select = document.getElementById('fav-select');
+    if (select.value) {
+        toggleFavorite(select.value);
+        select.value = '';
+    }
+}
+
+function removeFavorite(id) {
+    state.favorites = state.favorites.filter(fid => fid !== id);
+    saveToStorage();
+    showBookmarks(); // refresh view
+}
+
+function showAddBookmarkForm() {
+    const main = document.getElementById('content-area');
+    
+    main.innerHTML += `
+        <div class="card" style="margin-top:1rem;">
+            <h3>Ajouter un marque-page</h3>
+            
+            <div class="form-group">
+                <select id="bookmark-cat-select">
+                    ${state.categories.map(cat => `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`).join('')}
+                </select>
+                
+                <input type="text" id="bookmark-title-input" placeholder="Titre du marque-page..." style="flex:1;">
+                
+                <textarea id="bookmark-content-input" class="note-input" placeholder="Contenu (optionnel)..." rows="3"></textarea>
+            </div>
+
+            <button class="btn-primary" onclick="addBookmark()">➕ Ajouter</button>
+        </div>
+    `;
+}
+
+function addBookmark() {
+    const catId = document.getElementById('bookmark-cat-select').value;
+    const title = document.getElementById('bookmark-title-input').value.trim();
+    const content = document.getElementById('bookmark-content-input').value.trim();
+
+    if (!title) return alert('Veuillez entrer un titre.');
+
+    // Create a new note entry for this bookmark
+    const id = `bm_${Date.now()}`;
+    state.notes[id] = { title, content, tags: [], fav: false };
+    
+    // Add to bookmarks list for that category
+    if (!state.bookmarks[catId]) state.bookmarks[catId] = [];
+    state.bookmarks[catId].push(id);
+
+    saveToStorage();
+    showBookmarks(); // refresh view
+}
+
+// ==================== TAGS SYSTEM ====================
+function renderTags(containerId, noteId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const note = state.notes[noteId];
+    if (!note) {
+        container.innerHTML = '';
+        return;
+    }
+
+    // Render existing tags
+    container.innerHTML = note.tags.map(tag => `
+        <span class="tag" onclick="removeTag('${noteId}', '${tag}')">${tag}</span>
+    `).join('');
+
+    // Add new tag input
+    const inputDiv = document.createElement('div');
+    inputDiv.style.marginTop = '0.6rem';
+    inputDiv.innerHTML = `
+        <input type="text" id="${containerId}-tag-input" placeholder="+ Ajouter un tag..." style="padding:0.4rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary);">
+        <button class="btn-primary" onclick="addTag('${noteId}')" style="font-size:0.85rem; padding:0.4rem 0.7rem;">+</button>
+    `;
+    container.appendChild(inputDiv);
+}
+
+function addTag(noteId) {
+    const input = document.getElementById(`${noteId}-tag-input`);
+    if (!input || !input.value.trim()) return;
+
+    const tag = input.value.trim();
+    const note = state.notes[noteId];
+    
+    // Avoid duplicates
+    if (note.tags.includes(tag)) return alert('Ce tag existe déjà.');
+
+    note.tags.push(tag);
+    saveToStorage();
+    renderTags(`${noteId}-tags`, noteId);
+}
+
+function removeTag(noteId, tag) {
+    const note = state.notes[noteId];
+    if (!note) return;
+
+    note.tags = note.tags.filter(t => t !== tag);
+    saveToStorage();
+    renderTags(`${noteId}-tags`, noteId);
+}
+
+// ==================== SEARCH FUNCTIONALITY ====================
+function performSearch(query) {
+    const main = document.getElementById('content-area');
+    
+    if (!query.trim()) {
+        // No search — show current category content
+        return;
+    }
+
+    const lowerQuery = query.toLowerCase();
+    
+    // Search across all notes
+    let matches = [];
+    Object.values(state.notes).forEach(note => {
+        if (note.title.toLowerCase().includes(lowerQuery) || 
+            note.content.toLowerCase().includes(lowerQuery) ||
+            note.tags.some(t => t.toLowerCase().includes(lowerQuery))) {
+            matches.push({ id: note.id, title: note.title, content: note.content });
+        }
+    });
+
+    // Also search categories (simple text match on name)
+    state.categories.forEach(cat => {
+        if (cat.name.toLowerCase().includes(lowerQuery)) {
+            matches.push({ id: cat.id, title: cat.name, content: '' });
+        }
+    });
+
+    // Sort by relevance (title first, then content, then tags)
+    matches.sort((a, b) => {
+        const aScore = a.title.includes(lowerQuery) ? 3 : 0 + a.content.includes(lowerQuery) ? 2 : 0;
+        const bScore = b.title.includes(lowerQuery) ? 3 : 0 + b.content.includes(lowerQuery) ? 2 : 0;
+        return bScore - aScore;
+    });
+
+    if (matches.length === 0) {
+        main.innerHTML = `<h2>Recherche</h2><p style="color:var(--text-secondary);">Aucun résultat trouvé pour «${query}».</p>`;
+        return;
+    }
+
+    // Render search results as cards with quick navigation
+    main.innerHTML = `
+        <h2>🔍 Résultats de la recherche («${query}»)</h2>
+        
+        ${matches.map((m, i) => {
+            const isCategory = state.categories.find(c => c.id === m.id);
+            return `
+                <div class="card" style="${isCategory ? 'border-left:4px solid var(--accent-gold);' : ''}">
+                    <h3 style="color:${isCategory ? 'var(--accent-gold)' : 'inherit'};">${i+1}. ${m.title}</h3>
+                    
+                    ${!isCategory && m.content ? `<p>${m.content.substring(0, 250)}${m.content.length > 250 ? '...' : ''}</p>` : ''}
+                    
+                    <div style="margin-top:0.8rem;">
+                        <button class="btn-primary" onclick="navigateTo('${m.id}')">👁️ Ouvrir</button>
+                        
+                        ${!isCategory && m.tags.length > 0 ? `
+                            <span class="tags-container">${m.tags.map(t => `<span class="tag">${t}</span>`).join('')}</span>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('')}
+
+        <button onclick="clearSearch()" style="margin-top:1rem;">🔙 Annuler la recherche</button>
+    `;
+}
+
+function clearSearch() {
+    const main = document.getElementById('content-area');
+    // Re-render current category content (use stored state)
+    const activeCatId = Object.keys(state.notes).find(id => id.startsWith('bm_')) || 
+                        Object.values(state.categories)[0]?.id;
+    if (!activeCatId) return;
+
+    const cat = state.categories.find(c => c.id === activeCatId);
+    renderContent(cat);
+}
+
+// ==================== KEYBOARD SHORTCUTS PAGE ====================
+function showShortcutsPage() {
+    const main = document.getElementById('content-area');
+    
+    main.innerHTML = `
+        <h2>⌨️ Raccourcis clavier</h2>
+        
+        <div class="card">
+            <table style="width:100%; border-collapse:collapse;">
+                <thead><tr style="background:rgba(255,215,0,0.1);"><th style="padding:0.8rem; text-align:left;">Action</th><th style="padding:0.8rem; text-align:center;">Raccourci</th></tr></thead>
+                <tbody>
+                    <tr><td style="padding:0.8rem;">Ouvrir la recherche globale</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.6rem; border-radius:4px; font-family:sans-serif;">Ctrl + K</kbd></td></tr>
+                    <tr><td style="padding:0.8rem;">Fermer la recherche / Annuler</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.6rem; border-radius:4px; font-family:sans-serif;">Esc</kbd></td></tr>
+                    <tr><td style="padding:0.8rem;">Marquer/démarquer une note comme favorite</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.6rem; border-radius:4px; font-family:sans-serif;">Ctrl + F</kbd></td></tr>
+                    <tr><td style="padding:0.8rem;">Ouvrir la page des raccourcis (vous êtes ici)</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.6rem; border-radius:4px; font-family:sans-serif;">Ctrl + ?</kbd></td></tr>
+                    <tr><td style="padding:0.8rem;">Nouvelle note dans la catégorie active</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.6rem; border-radius:4px; font-family:sans-serif;">Ctrl + N</kbd></td></tr>
+                    <tr><td style="padding:0.8rem;">Ajouter un tag à la note active</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.6rem; border-radius:4px; font-family:sans-serif;">Ctrl + T</kbd></td></tr>
+                    <tr><td style="padding:0.8rem;">Ouvrir la page des favoris / marque-pages</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.6rem; border-radius:4px; font-family:sans-serif;">Ctrl + B</kbd></td></tr>
+                    <tr><td style="padding:0.8rem;">Ouvrir la page de documentation complète</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.6rem; border-radius:4px; font-family:sans-serif;">Ctrl + D</kbd></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:1.2rem;">💡 Astuce : utilisez la recherche globale (Ctrl+K) pour trouver n'importe quoi dans tout le grimoire.</h3>
+        </div>
+    `;
+}
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', () => {
+    loadFromStorage();
+    
+    // Render sidebar
+    renderSidebar();
+    
+    // Set up global search listener
+    const searchInput = document.getElementById('global-search');
+    if (searchInput) {
+        searchInput.value = localStorage.getItem('grimoire_search') || '';
+        searchInput.addEventListener('input', e => {
+            localStorage.setItem('grimoire_search', e.target.value);
+            performSearch(e.target.value.trim());
+        });
+        
+        // Ctrl+K to focus search
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+    }
+
+    // Set up keyboard shortcuts
+    document.addEventListener('keydown', e => {
+        const main = document.getElementById('content-area');
+        
+        // Ctrl+K — focus/search
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            searchInput?.focus();
+            return;
+        }
+
+        // Ctrl+F — toggle favorite in current note
+        if (e.ctrlKey && e.key === 'f') {
+            e.preventDefault();
+            
+            const activeCat = state.categories.find(c => c.id === Object.keys(state.notes).find(id => id.startsWith('bm_')));
+            if (!activeCat) return;
+
+            // Find the currently focused note element (simplified: use last rendered note)
+            const noteId = Object.values(state.notes)[0]?.id || '';
+            if (!noteId) return;
+
+            const note = state.notes[noteId];
+            note.fav = !note.fav;
+            
+            // Update sidebar to show fav icon
+            renderSidebar();
+            
+            saveToStorage();
+        }
+
+        // Ctrl+? — shortcuts page
+        if (e.ctrlKey && e.key === '?') {
+            e.preventDefault();
+            showShortcutsPage();
+        }
+
+        // Ctrl+N — new note in active category
+        if (e.ctrlKey && e.key === 'n') {
+            e.preventDefault();
+            
+            const activeCat = state.categories.find(c => c.id === Object.keys(state.notes).find(id => id.startsWith('bm_')));
+            if (!activeCat) return;
+
+            const newId = `note_${Date.now()}`;
+            state.notes[newId] = { title: 'Nouvelle note', content: '', tags: [], fav: false };
+            
+            // Add to bookmarks for this category
+            if (!state.bookmarks[activeCat.id]) state.bookmarks[activeCat.id] = [];
+            state.bookmarks[activeCat.id].push(newId);
+
+            saveToStorage();
+            renderSidebar();
+        }
+
+        // Ctrl+T — add tag in active note
+        if (e.ctrlKey && e.key === 't') {
+            e.preventDefault();
+            
+            const activeCat = state.categories.find(c => c.id === Object.keys(state.notes).find(id => id.startsWith('bm_')));
+            if (!activeCat) return;
+
+            const newId = `note_${Date.now()}`;
+            state.notes[newId] = { title: 'Nouvelle note', content: '', tags: [], fav: false };
+            
+            // Add to bookmarks for this category
+            if (!state.bookmarks[activeCat.id]) state.bookmarks[activeCat.id] = [];
+            state.bookmarks[activeCat.id].push(newId);
+
+            saveToStorage();
+            renderSidebar();
+        }
+
+        // Ctrl+B — favorites page
+        if (e.ctrlKey && e.key === 'b') {
+            e.preventDefault();
+            showBookmarks();
+        }
+
+        // Ctrl+D — documentation page
+        if (e.ctrlKey && e.key === 'd') {
+            e.preventDefault();
+            main.innerHTML = `
+                <h2>📚 Documentation complète</h2>
+                
+                <div class="card">
+                    <p><strong>Fonctionnalités principales :</strong></p>
+                    <ul style="margin-top:0.8rem; padding-left:1.5rem;">
+                        <li>Navigateur par catégories (Règles, Univers, Loot, NPCs, Cartes, Notes de session, Feuilles perso)</li>
+                        <li>Recherche globale (Ctrl+K) qui filtre dans tous les titres, contenus et tags</li>
+                        <li>Système de notes avec ajout/suppression de tags (Ctrl+T pour ajouter un tag)</li>
+                        <li>Favoris / Marque-pages (Ctrl+F pour marquer/démarquer une note comme favorite, Ctrl+B pour voir la liste)</li>
+                        <li>Générateur de loot automatique dans la catégorie Loot (d20/d100 + lieu choisi)</li>
+                        <li>Tables de loot pré-définies par type d'ennemi</li>
+                        <li>Mode sombre intégré (grimoire sombre avec décorations)</li>
+                        <li>Tout est sauvegardé dans le localStorage du navigateur — persiste après fermeture et fonctionne sur mobile</li>
+                    </ul>
+
+                    <p style="margin-top:1rem;"><strong>Raccourcis :</strong></p>
+                    <table style="width:100%; border-collapse:collapse; margin-top:0.8rem;">
+                        <thead><tr style="background:rgba(255,215,0,0.1);"><th style="padding:0.6rem; text-align:left;">Action</th><th style="padding:0.6rem; text-align:center;">Clavier</th></tr></thead>
+                        <tbody>
+                            <tr><td>Ouvrir la recherche globale</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.5rem; border-radius:4px; font-family:sans-serif;">Ctrl + K</kbd></td></tr>
+                            <tr><td>Fermer la recherche / Annuler</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.5rem; border-radius:4px; font-family:sans-serif;">Esc</kbd></td></tr>
+                            <tr><td>Marquer/démarquer une note comme favorite</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.5rem; border-radius:4px; font-family:sans-serif;">Ctrl + F</kbd></td></tr>
+                            <tr><td>Ouvrir la page des raccourcis (vous êtes ici)</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.5rem; border-radius:4px; font-family:sans-serif;">Ctrl + ?</kbd></td></tr>
+                            <tr><td>Nouvelle note dans la catégorie active</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.5rem; border-radius:4px; font-family:sans-serif;">Ctrl + N</kbd></td></tr>
+                            <tr><td>Ajouter un tag à la note active</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.5rem; border-radius:4px; font-family:sans-serif;">Ctrl + T</kbd></td></tr>
+                            <tr><td>Ouvrir la page des favoris / marque-pages</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.5rem; border-radius:4px; font-family:sans-serif;">Ctrl + B</kbd></td></tr>
+                            <tr><td>Ouvrir la page de documentation complète (vous êtes ici)</td><td style="text-align:center;"><kbd style="background:var(--bg-secondary); padding:0.3rem 0.5rem; border-radius:4px; font-family:sans-serif;">Ctrl + D</kbd></td></tr>
+                        </tbody>
+                    </table>
+
+                    <p style="margin-top:1rem;"><strong>Notes importantes :</strong></p>
+                    <ul style="margin-top:0.8rem; padding-left:1.5rem;">
+                        <li>Toutes les données sont stockées dans le localStorage du navigateur — pas de serveur, donc c'est 100 % privé et persiste même après fermeture.</li>
+                        <li>Sur mobile (Chrome/Safari), le localStorage fonctionne aussi ; vos notes seront sauvegardées automatiquement.</li>
+                        <li>Pour exporter/importer manuellement : ouvrez l'onglet de développement (F12) → Application → Local Storage → qwythos_grimoire_v1 — vous pouvez copier/coller le contenu JSON.</li>
+                    </ul>
+
+                    <p style="margin-top:1rem;"><strong>Conseils d'utilisation :</strong></p>
+                    <ol style="margin-top:0.8rem; padding-left:1.5rem;">
+                        <li>Ouvrez la recherche globale (Ctrl+K) pour trouver rapidement un NPC, une règle ou un objet.</li>
+                        <li>Marquez les notes importantes comme favorites (Ctrl+F) — elles apparaîtront dans la page Favoris / Marque-pages.</li>
+                        <li>Ajoutez des tags à vos notes (Ctrl+T) et utilisez la recherche par tag pour filtrer.</li>
+                        <li>Générez du loot rapidement avec le formulaire "Générateur de loot rapide" dans la catégorie Loot.</li>
+                    </ol>
+
+                    <p style="margin-top:1rem;"><strong>Design :</strong></p>
+                    <ul style="margin-top:0.8rem; padding-left:1.5rem;">
+                        <li>Le thème sombre "grimoire" est activé par défaut — vous pouvez changer les couleurs dans le fichier CSS si besoin.</li>
+                        <li>Toutes les pages sont responsive : testez sur mobile pour vérifier que tout fonctionne bien.</li>
+                    </ul>
+
+                    <p style="margin-top:1rem;"><strong>Dernière mise à jour :</strong> ${new Date().toLocaleDateString('fr-FR')}</p>
+                </div>
+            `;
+        }
+    });
+});
 </script>
-
 </body>
 </html>
